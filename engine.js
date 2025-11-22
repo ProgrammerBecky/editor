@@ -1,4 +1,11 @@
-// worker.js
+self.addEventListener('error', (e) => {
+  console.error( 'Caught in Engine Worker:', e.message, e.filename, e.lineno, e.colno );
+});
+
+self.addEventListener('unhandledrejection', (e) => {
+  console.error('Unhandled promise rejection in Engine Worker:', e.reason);
+});
+
 import { imagePolyfill } from './engine/image-polyfill.js';
 import { canvasPolyfill } from './engine/canvas-polyfill.js';
 import {
@@ -8,13 +15,11 @@ import {
 	MeshBasicMaterial,
 	Mesh	
 } from 'three';
-import { G } from '/engine/G.js';
+import { G } from './G.js';
 import { init } from './engine/init.js';
 import { editorInit } from './engine/editor.js';
 
 imagePolyfill( ImageLoader );
-
-
 
 self.onmessage = async (e) => {
 	console.log( e.data );
@@ -27,7 +32,7 @@ self.onmessage = async (e) => {
 		editorInit();
 		
 	// Load texture inside worker
-	const tex = G.texture.load( '/assets/test.jpg' );
+	const tex = G.texture.load( new URL('./assets/test.jpg', import.meta.url).href );
 
 	const geo = new BoxGeometry( 1,1,1 );
 	const mat = new MeshBasicMaterial({
@@ -45,3 +50,5 @@ self.onmessage = async (e) => {
 	}
 	
 };
+
+self.postMessage({ type: 'loaded' });

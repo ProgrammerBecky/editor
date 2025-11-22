@@ -4,7 +4,7 @@ import {
 	PerspectiveCamera,
 	TextureLoader,
 } from 'three';
-import { G } from './G.js';
+import { G } from '../G.js';
 
 export const init = ( params , canvas ) => {
 	
