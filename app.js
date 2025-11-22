@@ -1,13 +1,14 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, Menu  } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { AppMenu } from './app/appMenu.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function createWindow() {
-
-console.log( 'PATH', path.join(__dirname, 'app/preload.mjs') );
+;
 	const win = new BrowserWindow({
 		width: 1280,
 		height: 720,
@@ -17,6 +18,9 @@ console.log( 'PATH', path.join(__dirname, 'app/preload.mjs') );
 			preload: path.join(__dirname, 'app', 'preload.js')
 		}
 	});
+	
+  const menu = Menu.buildFromTemplate(AppMenu);
+  Menu.setApplicationMenu(menu);	
 
 	win.webContents.openDevTools({ mode: 'right' });
   win.loadFile( path.join(
