@@ -25,7 +25,8 @@ function createWindow() {
       nodeIntegration: true,
       contextIsolation: true,
       preload: path.join(__dirname, 'app', 'preload.js')
-    }
+    },
+		icon: __dirname + '/app/app.ico',
   });
 
   setupFileBrowser();
