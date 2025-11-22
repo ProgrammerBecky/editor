@@ -63,6 +63,22 @@ export class EditorFilePanel {
     return this.findFolderByPath(folder.children, parts);
   }
 
+	#getIconFromName( name ) {
+		let nameParts = name.split('.');
+		const extension = nameParts[ nameParts.length - 1 ].toLowerCase();
+		
+		if( ['glb','gltf','fbx'].includes( extension ) ) return "📦";
+		if( ['png','jpg'].includes( extension ) ) return "🖼️";
+		if( ['wav','mp3','ogg'].includes( extension ) ) return "🔊";
+		if( ['mp3'].includes( extension ) ) return "🎵";
+		if( ['js'].includes( extension ) ) return "👩‍💻";
+		if( ['json'].includes( extension ) ) return "📊";
+		if( ['txt'].includes( extension ) ) return "📃";
+		if( ['bin'].includes( extension ) ) return "🎰";
+		
+		return "📄";
+	}
+
   renderFolder(nodes, fullTree) {
     this.panel.innerHTML = "";
 
@@ -96,7 +112,7 @@ export class EditorFilePanel {
 
         this.panel.appendChild(div);
       } else {
-        div.textContent = "📄 " + node.name;
+        div.textContent = this.#getIconFromName( node.name ) + ' ' + node.name;
         this.panel.appendChild(div);
       }
 
