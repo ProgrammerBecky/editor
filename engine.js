@@ -22,7 +22,6 @@ import { editorInit } from './engine/editor.js';
 imagePolyfill( ImageLoader );
 
 self.onmessage = async (e) => {
-	console.log( e.data );
 	
 	const { type , params } = e.data;
 	if( e.data.canvas ) e.data.canvas = canvasPolyfill( e.data.canvas );
@@ -47,6 +46,14 @@ self.onmessage = async (e) => {
       requestAnimationFrame(loop);
     }
     loop();		
+	}
+	else if( type === 'window.resize' ) {
+		const { width , height } = params;
+		
+		G.camera.aspect = width / height;
+		G.camera.updateProjectionMatrix();
+		
+		G.renderer.setSize( width , height );
 	}
 	
 };

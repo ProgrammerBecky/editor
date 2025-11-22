@@ -60,4 +60,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 		if( type === 'loaded' ) initEngineWorker();
 		
 	});
+	
+	window.addEventListener( 'resize' , () => {
+		engineWorker.postMessage({
+			type: 'window.resize',
+			params: {
+				width: window.innerWidth,
+				height: window.innerHeight
+			}
+		});
+	});
 });
