@@ -1,2 +1,5 @@
-#Editor
-A barebones multi-threaded three render stack in an Electron wrap, using ES6 modules
+# Editor
+* Electron app
+* Multi-Threaded 3d Engine in web context
+* ES6 Worker Modules
+* OS File Browser (+drag and drop)
