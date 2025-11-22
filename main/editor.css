@@ -1,0 +1,21 @@
+.editor-file-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 10px;
+  overflow-y: auto;
+  font-family: sans-serif;
+}
+
+.file-browser-item {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.file-browser-folder {
+  font-weight: bold;
+}

@@ -2,6 +2,7 @@
   "type": "module",
   "main": "app.js",
   "dependencies": {
+    "chokidar": "^4.0.3",
     "es-module-shims": "^2.6.2",
     "three": "^0.181.2"
   },

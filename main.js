@@ -1,3 +1,5 @@
+import { editorFilePanel } from './main/editorFilePanel.js';
+
 let engineWorker;
 
 const getWorkerScript = async ( url ) => {
@@ -70,4 +72,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 			}
 		});
 	});
+	
+	editorFilePanel();
 });

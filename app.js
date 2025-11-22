@@ -1,14 +1,23 @@
-import { app, BrowserWindow, Menu  } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+import { readDirectoryTree } from "./app/readDirectoryTree.js";
+import { setupFileWatcher } from "./app/fileWatcher.js";
 
 import { AppMenu } from './app/appMenu.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const __assetsFolder = `${__dirname}\\assets`;
+
+function setupFileBrowser() {
+	ipcMain.handle( 'assets:getTree' , () => {
+		return readDirectoryTree( __assetsFolder  );
+	});
+}
 
 function createWindow() {
-;
 	const win = new BrowserWindow({
 		width: 1280,
 		height: 720,
@@ -18,6 +27,9 @@ function createWindow() {
 			preload: path.join(__dirname, 'app', 'preload.js')
 		}
 	});
+	
+	setupFileBrowser();
+	setupFileWatcher( win , __assetsFolder );
 	
   const menu = Menu.buildFromTemplate(AppMenu);
   Menu.setApplicationMenu(menu);	
