@@ -6,11 +6,9 @@
     "three": "^0.181.2"
   },
   "devDependencies": {
-    "electron": "^39.2.3",
-    "vite": "^7.2.4"
+    "electron": "^39.2.3"
   },
   "scripts": {
-    "app": "electron .",
-    "web": "vite"
+    "app": "electron ."
   }
 }
