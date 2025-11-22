@@ -17,7 +17,7 @@ import {
 } from 'three';
 import { G } from './G.js';
 import { init } from './engine/init.js';
-import { editorInit } from './engine/editor.js';
+import { Editor } from './engine/editor.js';
 
 imagePolyfill( ImageLoader );
 
@@ -28,7 +28,7 @@ self.onmessage = async (e) => {
 
   if( type === 'init' ) {
 		init( params , e.data.canvas );
-		editorInit();
+		G.editor = new Editor();
 		
 	// Load texture inside worker
 	const tex = G.texture.load( new URL('./assets/test.jpg', import.meta.url).href );
@@ -44,6 +44,8 @@ self.onmessage = async (e) => {
       mesh.rotation.y += 0.01;
       G.renderer.render(G.scene, G.camera);
       requestAnimationFrame(loop);
+			
+			if( G.editor ) G.editor.update();
     }
     loop();		
 	}
