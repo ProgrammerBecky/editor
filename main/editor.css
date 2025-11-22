@@ -9,6 +9,12 @@
   padding: 10px;
   overflow-y: auto;
   font-family: sans-serif;
+	border-left: 1px dashed white;
+}
+
+.editor-file-panel.drag-hover {
+  background: rgba(80, 150, 255, 0.15);
+  outline: 2px dashed #5897ff;
 }
 
 .file-browser-item {

@@ -7,5 +7,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 contextBridge.exposeInMainWorld("assetsAPI", {
   getTree: () => ipcRenderer.invoke("assets:getTree"),
-  onUpdate: (callback) => ipcRenderer.on("assets:updated", (_, data) => callback(data))
+  onUpdate: (callback) => ipcRenderer.on("assets:updated", (_, data) => callback(data)),
+	importFile: (sourcePath, targetFolder) => ipcRenderer.invoke("assets:importFile", { sourcePath, targetFolder }),
+  uploadFile: (fileData, fileName, targetFolder) => ipcRenderer.invoke("assets:uploadFile", { fileData, fileName, targetFolder }),	
 });
