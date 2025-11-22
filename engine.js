@@ -10,6 +10,7 @@ import {
 } from 'three';
 import { G } from '/engine/G.js';
 import { init } from './engine/init.js';
+import { editorInit } from './engine/editor.js';
 
 imagePolyfill( ImageLoader );
 
@@ -23,6 +24,7 @@ self.onmessage = async (e) => {
 
   if( type === 'init' ) {
 		init( params , e.data.canvas );
+		editorInit();
 		
 	// Load texture inside worker
 	const tex = G.texture.load( '/assets/test.jpg' );
@@ -33,7 +35,6 @@ self.onmessage = async (e) => {
 	});
 	const mesh = new Mesh(geo, mat);
 	G.scene.add( mesh );
-	G.camera.lookAt( mesh.position.x , mesh.position.y , mesh.position.z );		
 		
     function loop() {
       mesh.rotation.y += 0.01;

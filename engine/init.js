@@ -27,7 +27,8 @@ export const init = ( params , canvas ) => {
 		0.1,
 		1000
 	);
-	G.camera.position.set(0, 0, 5);
+	G.camera.position.set( 0 , 5 , 5 );
+	G.camera.lookAt( 0 , 0 , 0 );
 	
 	G.texture = new TextureLoader();
 }
