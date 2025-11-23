@@ -6,6 +6,9 @@ import { addDragDropArrayHandler } from './EditorSceneDragDrop.js';
 
 export class EditorScenePanel {
   constructor(panelId) {
+		
+		this.refresh = this.refresh.bind(this);
+		
     if (!G.entities) G.entities = [
       new EntityTerrain(),
       new EntityCube(),
@@ -28,9 +31,14 @@ export class EditorScenePanel {
     this.entityListContainer = document.createElement("div");
     this.entityListContainer.classList.add("entity-list");
     this.panel.appendChild(this.entityListContainer);
-
-    this.renderEntityList(this.entityListContainer, G.entities, true);
+		
+		window.addEventListener( 'update-editor-ui' , this.refresh );
+		this.refresh();
   }
+	
+	refresh() {
+		this.renderEntityList(this.entityListContainer, G.entities, true);		
+	}
 
   buildControlBar() {
     const controlBar = document.createElement("div");
@@ -63,6 +71,7 @@ export class EditorScenePanel {
   }
 
   destroy() {
+		window.removeListener( 'update-editor-ui' , this.uiUpdateEventListener );
     document.body.removeChild(this.panel);
   }
 

@@ -240,10 +240,23 @@
 .buffer-explorer-fieldset .buffer-explorer-legend {
 	cursor: pointer;
 	font-weight: bold;
+	position: relative;
+	
+	&.is-collapsed::after {
+		content: '🖱️';
+		position: absolute;
+		top: 0;
+		right: -16px;
+	}	
 }
 
 .buffer-explorer-fieldset .buffer-explorer-content {
 	padding: 0.2em 0;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-content.short-list {
+	height: 58px;
+	overflow: hidden;
 }
 
 .buffer-explorer-fieldset .buffer-explorer-row {
