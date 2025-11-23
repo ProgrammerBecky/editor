@@ -222,3 +222,44 @@
 	border-radius: 2px;
 	color: #eee;
 }
+
+/* Buffer Explorer */
+.buffer-explorer-panel {
+	font-family: monospace;
+	font-size: 0.8em;
+	overflow-x: auto;
+}
+
+.buffer-explorer-fieldset {
+	margin-bottom: 0.5em;
+	padding: 0.3em 0.5em;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-legend {
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-content {
+	padding: 0.2em 0;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-row {
+	margin-bottom: 0.1em;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-input {
+	width: 5em;
+	margin-right: 0.2em;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-span {
+	margin-right: 0.3em;
+}
+
+.buffer-explorer-fieldset .buffer-explorer-more {
+	font-style: italic;
+	color: #666;
+}
