@@ -51,15 +51,15 @@ export class EntityCube extends EntityInterface {
     panel.innerHTML = `
       <fieldset>
         <legend>Cube Size</legend>
-        <label>Width: <input class="editor-input" type="number" step="0.1" value="${p.width}" name="width"></label>
-        <label>Height: <input class="editor-input" type="number" step="0.1" value="${p.height}" name="height"></label>
-        <label>Depth: <input class="editor-input" type="number" step="0.1" value="${p.depth}" name="depth"></label>
+        <label>Width: <input class="editor-input" type="text" value="${p.width}" name="width"></label>
+        <label>Height: <input class="editor-input" type="text" value="${p.height}" name="height"></label>
+        <label>Depth: <input class="editor-input" type="text" value="${p.depth}" name="depth"></label>
       </fieldset>
       <fieldset>
         <legend>Cube Geometry</legend>
-        <label>Width Segments: <input class="editor-input" type="number" step="1" min="1" value="${p.widthSegments}" name="widthSegments"></label>
-        <label>Height Segments: <input class="editor-input" type="number" step="1" min="1" value="${p.heightSegments}" name="heightSegments"></label>
-        <label>Depth Segments: <input class="editor-input" type="number" step="1" min="1" value="${p.depthSegments}" name="depthSegments"></label>
+        <label>Width Segments: <input class="editor-input" type="text" value="${p.widthSegments}" name="widthSegments"></label>
+        <label>Height Segments: <input class="editor-input" type="text" value="${p.heightSegments}" name="heightSegments"></label>
+        <label>Depth Segments: <input class="editor-input" type="text" value="${p.depthSegments}" name="depthSegments"></label>
       </fieldset>
     `
 

@@ -7,20 +7,17 @@ import { addDragDropArrayHandler } from './EditorSceneDragDrop.js';
 
 export class EditorScenePanel {
   constructor(panelId) {
-		
-		this.refresh = this.refresh.bind(this);
-		
-    if (!G.entities) G.entities = [
-      new EntityCube(),
-    ];
+    this.refresh = this.refresh.bind(this);
+    this.openState = new WeakMap();
+
+    if (!G.entities) G.entities = [new EntityCube()];
 
     this.panel = document.createElement("div");
-    this.panel.classList.add("editor-panel");
-    this.panel.classList.add(`editor-panel-${panelId}`);
+    this.panel.classList.add("editor-panel", `editor-panel-${panelId}`);
     document.body.appendChild(this.panel);
 
     this.entityClasses = [
-			{ name: "Empty", cls: EntityInterface },
+      { name: "Empty", cls: EntityInterface },
       { name: "Terrain", cls: EntityTerrain },
       { name: "Cube", cls: EntityCube },
       { name: "Plane", cls: EntityPlane },
@@ -31,13 +28,76 @@ export class EditorScenePanel {
     this.entityListContainer = document.createElement("div");
     this.entityListContainer.classList.add("entity-list");
     this.panel.appendChild(this.entityListContainer);
-		
-		window.addEventListener( 'update-editor-ui' , this.refresh );
-		this.refresh();
+
+    window.addEventListener('update-editor-ui', this.refresh);
+    this.refresh();
   }
-	
+
+  getFocusedInputIndex(container) {
+    const inputs = container.querySelectorAll('input, textarea, select');
+    const focused = document.activeElement;
+    for (let i = 0; i < inputs.length; i++) {
+      if (inputs[i] === focused) return i;
+    }
+    return null;
+  }
+
+  restoreFocusedInput(container, index) {
+    if (index === null) return;
+    const inputs = container.querySelectorAll('input, textarea, select');
+    if (index < inputs.length) inputs[index].focus();
+  }
+
 	refresh() {
-		this.renderEntityList(this.entityListContainer, G.entities, true);		
+		// Delay execution to ensure any input values have updated
+		setTimeout(() => {
+			const scrollContainer = this.entityListContainer.parentNode;
+			const scrollTop = scrollContainer.scrollTop;
+
+			// --- Save focused input info ---
+			let focusedIndex = null;
+			let cursor = null;
+			let numberValue = null;
+
+			const focused = document.activeElement;
+			if (this.entityListContainer.contains(focused)) {
+				const inputs = this.entityListContainer.querySelectorAll('input, textarea, select');
+				for (let i = 0; i < inputs.length; i++) {
+					if (inputs[i] === focused) {
+						focusedIndex = i;
+						cursor = { start: focused.selectionStart, end: focused.selectionEnd };
+						break;
+					}
+				}
+			}
+
+			const tempContainer = document.createElement("div");
+			tempContainer.className = this.entityListContainer.className;
+			tempContainer.style.visibility = "hidden"; // hide until ready
+			this.renderEntityList(tempContainer, G.entities, true);
+
+			scrollContainer.replaceChild(tempContainer, this.entityListContainer);
+			this.entityListContainer = tempContainer;
+
+			scrollContainer.scrollTop = scrollTop;
+
+			requestAnimationFrame(() => {
+				tempContainer.style.visibility = "";
+
+				if (focusedIndex !== null) {
+					const inputs = this.entityListContainer.querySelectorAll('input, textarea, select');
+					const input = inputs[focusedIndex];
+					if (!input) return;
+
+					input.focus();
+
+					if (cursor && cursor.start !== null && cursor.end !== null) {
+						input.setSelectionRange(cursor.start, cursor.end);
+					}
+
+				}
+			});
+		}, 0);
 	}
 
   buildControlBar() {
@@ -61,9 +121,8 @@ export class EditorScenePanel {
       if (!cls) return;
       const entity = new cls();
       entity.entityList = [];
-      entity.isPanelOpen = false;
       G.entities.unshift(entity);
-      this.renderEntityList(this.entityListContainer, G.entities, true);
+      window.dispatchEvent(new CustomEvent('update-editor-ui'));
     });
     controlBar.appendChild(addButton);
 
@@ -71,21 +130,21 @@ export class EditorScenePanel {
   }
 
   destroy() {
-		window.removeEventListener( 'update-editor-ui' , this.uiUpdateEventListener );
+    window.removeEventListener('update-editor-ui', this.uiUpdateEventListener);
     document.body.removeChild(this.panel);
   }
 
   togglePanel(entity) {
-    entity.isPanelOpen = !entity.isPanelOpen;
-    this.renderEntityList(this.entityListContainer, G.entities, true);
+    const current = this.openState.get(entity) || false;
+    this.openState.set(entity, !current);
+    this.refresh();
   }
 
   renderEntityList(container, entities, isTopLevel = false, parentEntity = null) {
-    container.innerHTML = "";
+    const fragment = document.createDocumentFragment();
 
     entities.forEach(entity => {
       if (!entity.entityList) entity.entityList = [];
-      if (typeof entity.isPanelOpen !== "boolean") entity.isPanelOpen = false;
 
       const node = document.createElement("div");
       node.classList.add("entity-item");
@@ -97,16 +156,15 @@ export class EditorScenePanel {
       header.addEventListener("click", () => this.togglePanel(entity));
       node.appendChild(header);
 
-      container.appendChild(node);
-
-      // Determine correct array for drag-drop
       const arrayForDrag = isTopLevel ? G.entities : (parentEntity ? parentEntity.entityList : []);
       addDragDropArrayHandler(entity, header, arrayForDrag);
       header.addEventListener('entity-dropped', () => {
-        this.renderEntityList(container, entities, isTopLevel, parentEntity);
+        window.dispatchEvent(new CustomEvent('update-editor-ui'));
       });
 
-      if (entity.isPanelOpen) {
+      const isOpen = this.openState.get(entity) || false;
+
+      if (isOpen) {
         const panelNode = entity.showEditorPanel();
         if (panelNode instanceof Node) {
           panelNode.classList.add("entity-sub-panel");
@@ -138,9 +196,8 @@ export class EditorScenePanel {
             if (!cls) return;
             const newChild = new cls();
             newChild.entityList = [];
-            newChild.isPanelOpen = false;
             entity.entityList.unshift(newChild);
-            this.renderEntityList(container, entities, isTopLevel, parentEntity);
+            window.dispatchEvent(new CustomEvent('update-editor-ui'));
           });
           childControlBar.appendChild(addButton);
 
@@ -150,30 +207,33 @@ export class EditorScenePanel {
           childContainer.classList.add("entity-child-list");
           node.appendChild(childContainer);
 
-					if (entity.entityList.length === 0) {
-						const placeholder = document.createElement("div");
-						placeholder.textContent = 'no children';
-						placeholder.classList.add("entity-child-placeholder");
-						childContainer.appendChild(placeholder);
+          if (entity.entityList.length === 0) {
+            const placeholder = document.createElement("div");
+            placeholder.textContent = 'no children';
+            placeholder.classList.add("entity-child-placeholder");
+            childContainer.appendChild(placeholder);
 
-						addDragDropArrayHandler(entity, placeholder, entity.entityList);
+            addDragDropArrayHandler(entity, placeholder, entity.entityList);
 
-						placeholder.addEventListener("entity-dropped", () => {
-							this.renderEntityList(container, entities, isTopLevel, parentEntity);
-						});
-						node.appendChild( placeholder );
-					}
+            placeholder.addEventListener("entity-dropped", () => {
+              window.dispatchEvent(new CustomEvent('update-editor-ui'));
+            });
 
-          // Recursive render for children
+            node.appendChild(placeholder);
+          }
+
           this.renderEntityList(childContainer, entity.entityList, false, entity);
         }
+      } else if (entity.entityList.length > 0) {
+        const icon = document.createElement("span");
+        icon.textContent = "🫙";
+        icon.classList.add("entity-open-icon");
+        node.appendChild(icon);
       }
-			else if( entity.entityList.length > 0 ) {
-				const icon = document.createElement("span");
-				icon.textContent = "🫙";
-				icon.classList.add("entity-open-icon");
-				node.appendChild(icon);				
-			}
+
+      fragment.appendChild(node);
     });
+
+    container.appendChild(fragment);
   }
 }

@@ -60,24 +60,24 @@ export class EntityInterface {
     panel.innerHTML = `
       <fieldset>
         <legend>Position</legend>
-        <label>X: <input class="editor-input" type="number" step="0.1" value="${t.position.x}" name="posX"></label>
-        <label>Y: <input class="editor-input" type="number" step="0.1" value="${t.position.y}" name="posY"></label>
-        <label>Z: <input class="editor-input" type="number" step="0.1" value="${t.position.z}" name="posZ"></label>
+        <label>X: <input class="editor-input" type="text" value="${t.position.x}" name="posX"></label>
+        <label>Y: <input class="editor-input" type="text" value="${t.position.y}" name="posY"></label>
+        <label>Z: <input class="editor-input" type="text" value="${t.position.z}" name="posZ"></label>
       </fieldset>
 
       <fieldset>
         <legend>Rotation (Degrees)</legend>
-        <label>X: <input class="editor-input" type="number" step="1" value="${deg.x}" name="rotX"></label>
-        <label>Y: <input class="editor-input" type="number" step="1" value="${deg.y}" name="rotY"></label>
-        <label>Z: <input class="editor-input" type="number" step="1" value="${deg.z}" name="rotZ"></label>
+        <label>X: <input class="editor-input" type="text" step="1" value="${deg.x}" name="rotX"></label>
+        <label>Y: <input class="editor-input" type="text" step="1" value="${deg.y}" name="rotY"></label>
+        <label>Z: <input class="editor-input" type="text" step="1" value="${deg.z}" name="rotZ"></label>
       </fieldset>
 
       <fieldset>
         <legend>Scale</legend>
         <label>Uniform Scale<input type="checkbox" ${t.scaleLocked ? "checked" : ""} name="scaleLocked"></label>
-        <label>X: <input class="editor-input" type="number" step="0.1" value="${t.scale.x}" name="scaleX"></label>
-        <label>Y: <input class="editor-input" type="number" step="0.1" value="${t.scale.y}" name="scaleY"></label>
-        <label>Z: <input class="editor-input" type="number" step="0.1" value="${t.scale.z}" name="scaleZ"></label>
+        <label>X: <input class="editor-input" type="text" value="${t.scale.x}" name="scaleX"></label>
+        <label>Y: <input class="editor-input" type="text" value="${t.scale.y}" name="scaleY"></label>
+        <label>Z: <input class="editor-input" type="text" value="${t.scale.z}" name="scaleZ"></label>
       </fieldset>
     `
 
@@ -173,8 +173,7 @@ export class EntityInterface {
 
 					if (i <= maxEditable) {
 						const input = document.createElement('input');
-						input.type = 'number';
-						input.step = '0.01';
+						input.type = 'text';
 						input.value = array[index];
 						input.classList.add('buffer-explorer-input');
 						input.addEventListener('input', () => {
