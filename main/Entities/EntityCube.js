@@ -13,9 +13,9 @@ export class EntityCube extends EntityInterface {
     width: 1,
     height: 1,
     depth: 1,
-    widthSegments: 25,
-    heightSegments: 25,
-    depthSegments: 25
+    widthSegments: 1,
+    heightSegments: 1,
+    depthSegments: 1
   }
 
 
