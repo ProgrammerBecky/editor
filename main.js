@@ -1,7 +1,7 @@
 import { G } from './G.js';
 import { EditorMain } from './main/EditorMain.js';
 
-let engineWorker;
+G.engineWorker;
 
 const getWorkerScript = async ( url ) => {
 	
@@ -39,7 +39,7 @@ const initEngineWorker = () => {
 	canvas.setAttribute('id','ThreeD');
 	document.body.appendChild( canvas );
 
-	engineWorker.postMessage(
+	G.engineWorker.postMessage(
 		{
 			type: 'init',
 			canvas: offscreenCanvas,
@@ -53,11 +53,11 @@ const initEngineWorker = () => {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-	engineWorker = new Worker(
+	G.engineWorker = new Worker(
 		await getWorkerScript('engine.js'),
 	);
 
-	engineWorker.addEventListener( 'message' , message => {
+	G.engineWorker.addEventListener( 'message' , message => {
 		const { type } = message.data;
 
 		if( type === 'loaded' ) initEngineWorker();
@@ -65,7 +65,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	});
 	
 	window.addEventListener( 'resize' , () => {
-		engineWorker.postMessage({
+		G.engineWorker.postMessage({
 			type: 'window.resize',
 			params: {
 				width: window.innerWidth,

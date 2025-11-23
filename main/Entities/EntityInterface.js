@@ -5,6 +5,7 @@ import {
   MathUtils,
 	Group,
 } from 'three';
+import { G } from '../../G.js';
 
 export class EntityInterface {
 	
@@ -20,7 +21,9 @@ export class EntityInterface {
   }
 	
 	constructor() {
-    this.updateTransform();		
+		this.bufferAttributePanel = this.bufferAttributePanel.bind(this);
+		this.updateGeometry = this.updateGeometry.bind(this);
+    this.updateTransform();	
 	}
 	
   showEditorPanel() {
@@ -31,6 +34,35 @@ export class EntityInterface {
   }
 	
 	updateGeometry() {
+		this.sendGeometryToEngine();
+	}
+	
+	sendGeometryToEngine() {
+		if( this.mesh.geometry ) {
+			for( const i in this.mesh.geometry.attributes ) {
+				const attribute = this.mesh.geometry.getAttribute( i );
+
+				G.engineWorker.postMessage({
+					type: 'mesh-geometry-attribute',
+					params: {
+						uuid: this.mesh.uuid,
+						attribute: i,
+						itemSize: attribute.itemSize,
+						array: attribute.array,
+					}
+				});
+			}
+			
+			if (this.mesh.geometry.index) {
+        G.engineWorker.postMessage({
+					type: 'mesh-geometry-index',
+					params: {
+						uuid: this.mesh.uuid,
+						array: Array.from(this.mesh.geometry.index.array),
+					}
+        });
+			}			
+		}		
 	}
 	
 	updateUI() {
@@ -45,6 +77,12 @@ export class EntityInterface {
 			this.mesh.quaternion.copy(t.rotation)
 		}
   }
+	
+	endsWithDecimal( vl ) {
+		const lastChar = String(vl[ vl.length -1 ] );
+		if( ['0','1','2','3','4','5','6','7','8','9'].includes( lastChar ) ) return true;
+		return false;
+	}
 	
   transformEditorPanel() {
     const t = this.transformParams
@@ -85,6 +123,8 @@ export class EntityInterface {
       input.addEventListener('input', e => {
         const name = e.target.name
         const v = parseFloat(e.target.value)
+				if (isNaN(v)) return;
+				if( ! this.endsWithDecimal( e.target.value ) ) return;
 
         switch (name) {
           case 'posX': t.position.x = v; break
@@ -130,16 +170,14 @@ export class EntityInterface {
     return panel
   }	
 	
-	bufferAttributePanel(maxEditable = 64, maxViewable = 100) {
+	bufferAttributePanel(maxEditable = 24, maxViewable = 100) {
 		const panel = document.createElement('div');
-		if( ! this.mesh ) return panel;
+		if (!this.mesh) return panel;
 
 		panel.classList.add('buffer-explorer-panel');
 
 		const geometry = this.mesh.geometry;
-		if (!geometry || !geometry.isBufferGeometry) {
-			return panel;
-		}
+		if (!geometry || !geometry.isBufferGeometry) return panel;
 
 		Object.entries(geometry.attributes).forEach(([attrName, bufferAttr]) => {
 			const fieldset = document.createElement('fieldset');
@@ -147,16 +185,13 @@ export class EntityInterface {
 
 			const legend = document.createElement('legend');
 			legend.classList.add('buffer-explorer-legend');
-
 			legend.textContent = `${attrName} (itemSize: ${bufferAttr.itemSize}, count: ${bufferAttr.count})`;
 			fieldset.appendChild(legend);
 
 			const content = document.createElement('div');
 			content.classList.add('buffer-explorer-content');
 			content.classList.add('short-list');
-
-			// NEW: legend gets collapsed class initially
-			legend.classList.add('is-collapsed');
+			fieldset.appendChild(content);
 
 			const array = bufferAttr.array;
 			const itemSize = bufferAttr.itemSize;
@@ -171,15 +206,24 @@ export class EntityInterface {
 					const index = i * itemSize + j;
 					if (index >= array.length) break;
 
-					if (i <= maxEditable) {
+					if (i < maxEditable) {
 						const input = document.createElement('input');
 						input.type = 'text';
 						input.value = array[index];
 						input.classList.add('buffer-explorer-input');
+
+						// Synchronous update handler
 						input.addEventListener('input', () => {
-							array[index] = parseFloat(input.value);
-							bufferAttr.needsUpdate = true;
+							const value = parseFloat(input.value);
+							if (isNaN(value)) return;
+
+							// Update the typed array directly
+							array[index] = value;
+
+							// Immediately trigger your update logic
+							this.sendGeometryToEngine();
 						});
+
 						row.appendChild(input);
 					} else {
 						const span = document.createElement('span');
@@ -192,6 +236,7 @@ export class EntityInterface {
 				content.appendChild(row);
 			}
 
+			// Add "..." if there are more items than displayed
 			if (itemCount * itemSize > displayCount * itemSize) {
 				const more = document.createElement('div');
 				more.textContent = '...';
@@ -199,8 +244,7 @@ export class EntityInterface {
 				content.appendChild(more);
 			}
 
-			fieldset.appendChild(content);
-
+			// Collapsible legend behavior
 			legend.addEventListener('click', () => {
 				if (content.classList.contains('short-list')) {
 					content.classList.remove('short-list');

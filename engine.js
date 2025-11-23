@@ -10,10 +10,10 @@ import { imagePolyfill } from './engine/image-polyfill.js';
 import { canvasPolyfill } from './engine/canvas-polyfill.js';
 import {
 	ImageLoader,
-	
-	BoxGeometry,
+	BufferGeometry,
+	BufferAttribute,
+	Mesh,
 	MeshBasicMaterial,
-	Mesh	
 } from 'three';
 import { G } from './G.js';
 import { init } from './engine/init.js';
@@ -30,24 +30,16 @@ self.onmessage = async (e) => {
 		init( params , e.data.canvas );
 		G.editor = new Editor();
 		
-	// Load texture inside worker
-	const tex = G.texture.load( new URL('./assets/test.jpg', import.meta.url).href );
+		// Load texture inside worker
+		const tex = G.texture.load( new URL('./assets/test.jpg', import.meta.url).href );
 
-	const geo = new BoxGeometry( 1,1,1 );
-	const mat = new MeshBasicMaterial({
-		map: tex
-	});
-	const mesh = new Mesh(geo, mat);
-	G.scene.add( mesh );
-		
-    function loop() {
-      mesh.rotation.y += 0.01;
-      G.renderer.render(G.scene, G.camera);
-      requestAnimationFrame(loop);
+		function loop() {
+			G.renderer.render(G.scene, G.camera);
+			requestAnimationFrame(loop);
 			
 			if( G.editor ) G.editor.update();
-    }
-    loop();		
+		}
+		loop();		
 	}
 	else if( type === 'window.resize' ) {
 		const { width , height } = params;
@@ -56,6 +48,40 @@ self.onmessage = async (e) => {
 		G.camera.updateProjectionMatrix();
 		
 		G.renderer.setSize( width , height );
+	}
+	else if( type === 'mesh-geometry-attribute' ) {
+		let object;
+		
+		G.scene.traverse( child => {
+			if( child.uuid === params.uuid ) object = child;
+		});
+		
+		if( ! object ) {
+			const geometry = new BufferGeometry();
+			const material = new MeshBasicMaterial({color:0x0000ff});
+			
+			object = new Mesh( geometry , material );
+			object.uuid = params.uuid;
+			G.scene.add( object );
+		}
+		
+		object.geometry.setAttribute( params.attribute , new BufferAttribute( new Float32Array( params.array ) , params.itemSize ) );
+		object.geometry.attributes[ params.attribute ].needsUpdate = true;
+	}
+	else if (type === 'mesh-geometry-index') {
+    let object;
+    G.scene.traverse(child => {
+        if (child.uuid === params.uuid) object = child;
+    });
+
+    if (!object) {
+			const geometry = new THREE.BufferGeometry();
+			object = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 0x0000ff }));
+			object.uuid = params.uuid;
+			G.scene.add(object);
+    }
+
+    object.geometry.setIndex(params.array);
 	}
 	
 };

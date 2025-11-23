@@ -34,13 +34,15 @@ export class EntityCube extends EntityInterface {
     const p = this.geometryParams
 
     this.mesh.geometry = new BoxGeometry(
-      p.width,
-      p.height,
-      p.depth,
-      p.widthSegments,
-      p.heightSegments,
-      p.depthSegments
+      Number( p.width ) ?? 1,
+      Number( p.height ) ?? 1,
+      Number( p.depth ) ?? 1,
+      Number( p.widthSegments ) ?? 1,
+      Number( p.heightSegments ) ?? 1,
+      Number( p.depthSegments ) ?? 1
     )
+		
+		super.updateGeometry();
   }
 
 
@@ -66,7 +68,10 @@ export class EntityCube extends EntityInterface {
     panel.querySelectorAll('input').forEach(input => {
       input.addEventListener('input', e => {
         const name = e.target.name
+				if( ! this.endsWithDecimal( e.target.value ) ) return;
         let value = parseFloat(e.target.value)
+				
+				if (isNaN(value)) return;
         if (name.includes('Segments')) value = Math.max(1, Math.floor(value))
         this.geometryParams[name] = value
         this.updateGeometry()
