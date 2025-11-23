@@ -60,6 +60,13 @@
 	width: 280px;
 }
 
+/* Asset Browser */
+.file-browser-folder.drag-hover {
+  background-color: rgba(0, 120, 255, 0.3);
+  outline: 1px solid #0078ff;
+  transition: background-color 0.15s ease;
+}
+
 /* Scene Browser */
 .entity-list {
   display: flex;

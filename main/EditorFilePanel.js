@@ -51,33 +51,35 @@ export class EditorFilePanel {
   renderFolder(nodes, fullTree) {
     this.panel.innerHTML = "";
 
-    if (this.currentPath !== "") {
-      const up = document.createElement("div");
-      up.classList.add("file-browser-item");
-      up.textContent = "↩️ ..";
+		if (this.currentPath !== "") {
+			const up = document.createElement("div");
+			up.classList.add("file-browser-item", "file-browser-folder"); // mark as folder for highlight
+			up.textContent = "↩️ ..";
 
-      up.addEventListener("click", () => {
-        const parts = this.currentPath.split("/").filter(v => v);
-        parts.pop();
-        this.currentPath = parts.join("/");
-        this.loadTree();
-      });
+			up.addEventListener("click", () => {
+				const parts = this.currentPath.split("/").filter(v => v);
+				parts.pop();
+				this.currentPath = parts.join("/");
+				this.loadTree();
+			});
 
-      addFileDragDropHandler(
-        up,
-        () => up.dataset.dragSource || null,
-        async (srcPath) => {
-          const parts = this.currentPath.split("/").filter(v => v);
-          parts.pop();
-          const targetFolder = parts.join("/");
-          await window.assetsAPI.moveFile(srcPath, targetFolder);
-          this.loadTree();
-        }
-      );
+			addFileDragDropHandler(
+				up,
+				() => up.dataset.dragSource || null,
+				async (srcPath) => {
+					const parts = this.currentPath.split("/").filter(v => v);
+					parts.pop();
+					const targetFolder = parts.join("/"); 
+					if (srcPath !== targetFolder) { // avoid moving into self
+						await window.assetsAPI.moveFile(srcPath, targetFolder);
+						this.loadTree();
+					}
+				}
+			);
 
-      this.panel.appendChild(up);
-    }
-
+			this.panel.appendChild(up);
+		}
+		
     nodes.forEach(node => {
       const div = document.createElement("div");
       div.classList.add("file-browser-item");

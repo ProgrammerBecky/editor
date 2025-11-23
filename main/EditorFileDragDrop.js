@@ -16,15 +16,18 @@ export const addFileDragDropHandler = (node, getPathFn, onDropFn) => {
   node.addEventListener("dragend", () => {
     currentlyDragging = null;
     node.classList.remove("dragging");
+    node.classList.remove("drag-hover"); // ensure highlight removed
   });
 
   node.addEventListener("dragover", e => {
     e.preventDefault();
-    node.classList.add("drag-hover");
+    if (!node.classList.contains("drag-hover")) {
+      node.classList.add("drag-hover"); // highlight folder while dragging over
+    }
   });
 
   node.addEventListener("dragleave", () => {
-    node.classList.remove("drag-hover");
+    node.classList.remove("drag-hover"); // remove highlight when leaving
   });
 
   node.addEventListener("drop", async e => {
@@ -32,11 +35,10 @@ export const addFileDragDropHandler = (node, getPathFn, onDropFn) => {
     node.classList.remove("drag-hover");
 
     if (!currentlyDragging) return;
-
     const srcPath = currentlyDragging.path;
     if (!srcPath) return;
 
-    await onDropFn(srcPath);
+    await onDropFn(srcPath); // call your move function or callback
 
     currentlyDragging = null;
   });
