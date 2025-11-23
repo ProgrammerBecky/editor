@@ -71,7 +71,7 @@ export class EditorScenePanel {
   }
 
   destroy() {
-		window.removeListener( 'update-editor-ui' , this.uiUpdateEventListener );
+		window.removeEventListener( 'update-editor-ui' , this.uiUpdateEventListener );
     document.body.removeChild(this.panel);
   }
 
