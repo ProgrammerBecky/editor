@@ -3,6 +3,13 @@ export const AppMenu =
 	{
 		label: 'File',
 		submenu: [
+			{
+        label: 'Refresh',
+        accelerator: 'CmdOrCtrl+R',
+        click: (menuItem, browserWindow) => {
+          if (browserWindow) browserWindow.reload();
+        }
+      },		
 			{ label: 'New File', accelerator: 'CmdOrCtrl+N', click: () => console.log('New File') },
 			{ label: 'Open File', accelerator: 'CmdOrCtrl+O', click: () => console.log('Open File') },
 			{ type: 'separator' },

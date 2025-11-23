@@ -1,7 +1,10 @@
 export class EditorFilePanel {
-  constructor() {
+
+  constructor( panelId ) {
+		
     this.panel = document.createElement( "div" );
-    this.panel.classList.add( "editor-file-panel" );
+    this.panel.classList.add( "editor-panel" );
+		this.panel.classList.add( `editor-panel-${panelId}` );
     document.body.appendChild( this.panel );
 
     this.currentPath = "";
@@ -13,6 +16,10 @@ export class EditorFilePanel {
       this.loadTree();
     } );
   }
+	
+	destroy() {
+		document.body.removeChild( this.panel );
+	}
 
   setupDragAndDrop() {
     this.panel.addEventListener( "dragover", ( e ) => {

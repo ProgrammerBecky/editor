@@ -1,5 +1,5 @@
 import { G } from './G.js';
-import { EditorFilePanel } from './main/EditorFilePanel.js';
+import { EditorMain } from './main/EditorMain.js';
 
 let engineWorker;
 
@@ -74,5 +74,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 		});
 	});
 	
-	G.filePanel = new EditorFilePanel();
+	G.editor = new EditorMain();
 });
