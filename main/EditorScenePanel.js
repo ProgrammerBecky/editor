@@ -71,7 +71,7 @@ export class EditorScenePanel {
     this.renderEntityList(this.entityListContainer, G.entities, true);
   }
 
-  renderEntityList(container, entities, isTopLevel = false) {
+  renderEntityList(container, entities, isTopLevel = false, parentEntity = null) {
     container.innerHTML = "";
 
     entities.forEach(entity => {
@@ -88,13 +88,14 @@ export class EditorScenePanel {
       header.addEventListener("click", () => this.togglePanel(entity));
       node.appendChild(header);
 
-      // Only top-level headers get drag-and-drop
-      if (isTopLevel) {
-        addDragDropArrayHandler(entity, header);
-        header.addEventListener('entity-dropped', () => {
-          this.renderEntityList(this.entityListContainer, G.entities, true);
-        });
-      }
+      container.appendChild(node);
+
+      // Determine correct array for drag-drop
+      const arrayForDrag = isTopLevel ? G.entities : (parentEntity ? parentEntity.entityList : []);
+      addDragDropArrayHandler(entity, header, arrayForDrag);
+      header.addEventListener('entity-dropped', () => {
+        this.renderEntityList(container, entities, isTopLevel, parentEntity);
+      });
 
       if (entity.isPanelOpen) {
         const panelNode = entity.showEditorPanel();
@@ -130,7 +131,7 @@ export class EditorScenePanel {
             newChild.entityList = [];
             newChild.isPanelOpen = false;
             entity.entityList.unshift(newChild);
-            this.renderEntityList(container, entities, isTopLevel);
+            this.renderEntityList(container, entities, isTopLevel, parentEntity);
           });
           childControlBar.appendChild(addButton);
 
@@ -140,12 +141,16 @@ export class EditorScenePanel {
           childContainer.classList.add("entity-child-list");
           node.appendChild(childContainer);
 
-          // Recursive render for children (drag disabled)
-          this.renderEntityList(childContainer, entity.entityList, false);
+          // Recursive render for children
+          this.renderEntityList(childContainer, entity.entityList, false, entity);
         }
       }
-
-      container.appendChild(node);
+			else if( entity.entityList.length > 0 ) {
+				const icon = document.createElement("span");
+				icon.textContent = "🫙";
+				icon.classList.add("entity-open-icon");
+				node.appendChild(icon);				
+			}
     });
   }
 }
