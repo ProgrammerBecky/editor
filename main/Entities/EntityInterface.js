@@ -22,16 +22,12 @@ export class EntityInterface {
     this.updateTransform();		
 	}
 	
-	showEditorPanel() {
-		const panel = document.createElement( 'div' );
-		panel.innerHTML = `
-		<fieldset>
-			<label>
-				no configuration
-			</label>
-		</fieldset>`;
-		return panel;
-	}
+  showEditorPanel() {
+    const panel = document.createElement('div')
+    panel.appendChild(this.transformEditorPanel())
+    panel.appendChild(this.bufferAttributePanel())
+    return panel
+  }
 	
 	updateGeometry() {
 		
@@ -136,6 +132,8 @@ export class EntityInterface {
 	
 	bufferAttributePanel(maxEditable = 64, maxViewable = 100) {
 		const panel = document.createElement('div');
+		if( ! this.mesh ) return panel;
+
 		panel.classList.add('buffer-explorer-panel');
 
 		const geometry = this.mesh.geometry;

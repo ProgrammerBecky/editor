@@ -48,8 +48,7 @@
 
 /* All Panels */
 .editor-panel {
-  height: calc( 100% - 22px );
-  background: rgba(0, 0, 0, 0.5);
+  height: calc( 100% - 45px );
   color: white;
   padding: 10px;
   overflow-y: auto;
@@ -58,6 +57,7 @@
 	position: absolute;
 	top: 22px;
 	width: 280px;
+	opacity: 0.95;
 }
 
 /* Asset Browser */
@@ -78,6 +78,7 @@
   border: 1px solid #333;
   background: #1a1a1a;
   height: 100%;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .entity-child-list {
