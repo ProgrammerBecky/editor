@@ -16,7 +16,14 @@
 		<title>Editor</title>
 		<link rel="stylesheet" href="./main/editor.css"/>
 		<script src="node_modules/es-module-shims/dist/es-module-shims.js"></script>
-		<script type="importmap" src="./engine/importmap.js"></script>
+		<script type="importmap">
+{
+	"imports": {
+		"three": "./node_modules/three/build/three.module.js",
+		"jsm/": "./node_modules/three/examples/jsm/"
+	}
+}		
+		</script>
 		<style>
 			html, body {
 				margin: 0;
