@@ -1,3 +1,4 @@
+import { EntityInterface } from './Entities/EntityInterface.js';
 import { EntityCube } from './Entities/EntityCube.js';
 import { EntityPlane } from './Entities/EntityPlane.js';
 import { EntityTerrain } from './Entities/EntityTerrain.js';
@@ -10,9 +11,7 @@ export class EditorScenePanel {
 		this.refresh = this.refresh.bind(this);
 		
     if (!G.entities) G.entities = [
-      new EntityTerrain(),
       new EntityCube(),
-      new EntityPlane(),
     ];
 
     this.panel = document.createElement("div");
@@ -21,6 +20,7 @@ export class EditorScenePanel {
     document.body.appendChild(this.panel);
 
     this.entityClasses = [
+			{ name: "Empty", cls: EntityInterface },
       { name: "Terrain", cls: EntityTerrain },
       { name: "Cube", cls: EntityCube },
       { name: "Plane", cls: EntityPlane },
@@ -149,6 +149,20 @@ export class EditorScenePanel {
           const childContainer = document.createElement("div");
           childContainer.classList.add("entity-child-list");
           node.appendChild(childContainer);
+
+					if (entity.entityList.length === 0) {
+						const placeholder = document.createElement("div");
+						placeholder.textContent = 'no children';
+						placeholder.classList.add("entity-child-placeholder");
+						childContainer.appendChild(placeholder);
+
+						addDragDropArrayHandler(entity, placeholder, entity.entityList);
+
+						placeholder.addEventListener("entity-dropped", () => {
+							this.renderEntityList(container, entities, isTopLevel, parentEntity);
+						});
+						node.appendChild( placeholder );
+					}
 
           // Recursive render for children
           this.renderEntityList(childContainer, entity.entityList, false, entity);

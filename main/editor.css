@@ -98,6 +98,20 @@
 	margin-bottom: 15px;
 }
 
+.entity-child-placeholder {
+  height: 40px;
+  margin: 4px 0;
+  padding: 8px;
+  border: 1px dashed #666;
+  color: #666;
+  font-size: 0.8em;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
 .entity-item {
   position: relative;
   display: flex;

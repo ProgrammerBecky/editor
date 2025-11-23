@@ -23,22 +23,16 @@ export class EntityCube extends EntityInterface {
     super()
     this.scene = scene
 
-    this.mesh = new Mesh(
-      new BoxGeometry(
-        this.geometryParams.width,
-        this.geometryParams.height,
-        this.geometryParams.depth,
-        this.geometryParams.widthSegments,
-        this.geometryParams.heightSegments,
-        this.geometryParams.depthSegments
-      ),
-      new MeshStandardMaterial({ color: 0x00ff00 })
-    )
+    this.updateGeometry();
   }
 
   updateGeometry() {
+    if( this.mesh?.geometry ) {
+			this.mesh.geometry.dispose();
+		}
+		
     const p = this.geometryParams
-    this.mesh.geometry.dispose()
+
     this.mesh.geometry = new BoxGeometry(
       p.width,
       p.height,

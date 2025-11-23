@@ -2,14 +2,15 @@ import {
 	Vector3,
 	Quaternion,
 	Euler,
-  MathUtils
+  MathUtils,
+	Group,
 } from 'three';
 
 export class EntityInterface {
 	
 	entityList = [];
-	editorName = '❔ unnamed entity';
-	mesh;
+	editorName = '❔ Empty';
+	mesh = new Group();
 	
   transformParams = {
     position: new Vector3(0, 0, 0),
@@ -30,7 +31,6 @@ export class EntityInterface {
   }
 	
 	updateGeometry() {
-		
 	}
 	
 	updateUI() {
@@ -138,7 +138,6 @@ export class EntityInterface {
 
 		const geometry = this.mesh.geometry;
 		if (!geometry || !geometry.isBufferGeometry) {
-			panel.textContent = "No BufferGeometry available.";
 			return panel;
 		}
 
