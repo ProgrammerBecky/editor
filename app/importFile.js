@@ -40,34 +40,48 @@ function addUploadFileListener( win , assetsFolder ) {
   } );
 }
 
-function addMoveFileListener( win , assetsFolder ) {
-	ipcMain.handle( "assets:moveFile", async ( _, { sourcePath, targetFolder } ) => {
-		try {
-			const absSourcePath = path.join( assetsFolder, sourcePath ); // resolve relative to assetsFolder
-			const destinationFolder = targetFolder ? path.join( assetsFolder, targetFolder ) : assetsFolder;
+function addMoveFileListener(win, assetsFolder) {
+  ipcMain.handle("assets:moveFile", async (_, { sourcePath, targetFolder }) => {
+    try {
+      // Resolve absolute source path relative to assetsFolder
+      const absSourcePath = path.resolve(assetsFolder, sourcePath);
 
-			if ( !fs.existsSync( absSourcePath ) ) {
-				throw new Error( `Source does not exist: ${absSourcePath}` );
-			}
+      // Resolve absolute target folder
+      const destinationFolder = targetFolder 
+        ? path.resolve(assetsFolder, targetFolder) 
+        : assetsFolder;
 
-			if ( !fs.existsSync( destinationFolder ) ) fs.mkdirSync( destinationFolder, { recursive: true } );
+      if (!fs.existsSync(absSourcePath)) {
+        throw new Error(`Source does not exist: ${absSourcePath}`);
+      }
 
-			const fileName = path.basename( absSourcePath );
-			let destinationPath = path.join( destinationFolder, fileName );
+      if (!fs.existsSync(destinationFolder)) {
+        fs.mkdirSync(destinationFolder, { recursive: true });
+      }
 
-			destinationPath = avoidOverwrite( destinationPath );
+      // Prevent moving a file into the same folder with the same name
+      const fileName = path.basename(absSourcePath);
+      let destinationPath = path.join(destinationFolder, fileName);
+      destinationPath = path.resolve(destinationPath);
 
-			fs.renameSync( absSourcePath, destinationPath );
+      if (absSourcePath === destinationPath) {
+        throw new Error("Source and destination paths are the same.");
+      }
 
-			win.webContents.send( "assets:updated" );
+      destinationPath = avoidOverwrite(destinationPath);
 
-			return { ok: true, path: destinationPath };
-		} catch ( err ) {
-			console.error( "Move failed:", err );
-			return { ok: false, error: err.message };
-		}
-	} );
+      fs.renameSync(absSourcePath, destinationPath);
+
+      win.webContents.send("assets:updated");
+
+      return { ok: true, path: destinationPath };
+    } catch (err) {
+      console.error("Move failed:", err);
+      return { ok: false, error: err.message };
+    }
+  });
 }
+
 
 export function importFile( win, assetsFolder ) {
 	addUploadFileListener( win, assetsFolder );
